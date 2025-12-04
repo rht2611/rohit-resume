@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rohit Kumar | Interactive Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Placeholder Comments Required by Prompt -->
+    <!-- Chosen Palette: Warm Neutrals (Stone/Sand) with Professional Blue Accents. Chosen for clarity, readability, and a calm, trustworthy aesthetic suitable for a QA professional. -->
+    
+    <!-- Application Structure Plan: 
+         1. Header: Quick contact access and branding.
+         2. Executive Dashboard: High-level metrics and a "Skill Balance" visualization (Radar Chart) to immediately show the dual nature of the candidate (Tech + Management).
+         3. Interactive Timeline: A list of roles that, when clicked, updates a central content pane. This avoids scrolling fatigue and keeps the user focused on the details they care about.
+         4. Impact & Education: Static grids for rapid scanning of credentials.
+         5. Logic: Vanilla JS handles tab switching for the timeline and rendering the chart. Data is stored in a JSON-like structure within the JS for easy updates.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Radar Chart (Chart.js): To compare "Technical" vs "Functional" proficiency. Justification: Shows Rohit is well-rounded (SME + Lead).
+         2. Interactive List/Detail View: For Experience. Justification: Allows the user to dig into the "Subject Matter Expert" details without being overwhelmed by text walls.
+         3. Metric Cards: Top of page. Justification: Immediate "at a glance" value proposition (8.5 Years, SME, etc.).
+         4. NO SVG/Mermaid: Using Unicode emojis for icons and CSS shapes for layout elements as requested.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        /* Custom Utilities */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Tailwind max-w-xl approx */
+            height: 350px;
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .timeline-btn.active {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            border-color: #2563eb;
+        }
+
+        /* Smooth transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Navigation / Header -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">RK</div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-stone-900">Rohit Kumar</h1>
+                        <p class="text-xs text-stone-500 uppercase tracking-wider">QA SME & Project Lead</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <button onclick="scrollToSection('summary')" class="text-stone-600 hover:text-blue-600 font-medium transition">Summary</button>
+                    <button onclick="scrollToSection('skills')" class="text-stone-600 hover:text-blue-600 font-medium transition">Skills</button>
+                    <button onclick="scrollToSection('experience')" class="text-stone-600 hover:text-blue-600 font-medium transition">Experience</button>
+                    <button onclick="scrollToSection('contact')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition shadow-sm">Contact Me</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+
+        <!-- 1. Hero & Metrics Section -->
+        <section id="summary" class="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
+            <div class="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="space-y-6">
+                    <div class="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-semibold border border-blue-100">
+                        🚀 Open to Opportunities
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight text-stone-900">
+                        Ensuring Pixel-Perfect <span class="text-blue-600">Quality</span> & Digital Accessibility.
+                    </h2>
+                    <p class="text-lg text-stone-600 leading-relaxed">
+                        Highly experienced Quality Assurance Subject Matter Expert (SME) with over 8.5 years in the ITES industry. 
+                        I bridge the gap between technical execution and client expectations, ensuring W3C/WCAG compliance and driving customer success.
+                    </p>
+                    
+                    <!-- Quick Metrics Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+                        <div class="p-4 bg-stone-50 rounded-xl text-center border border-stone-100">
+                            <div class="text-2xl font-bold text-blue-600">8.5+</div>
+                            <div class="text-xs text-stone-500 font-medium uppercase mt-1">Years Exp</div>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-xl text-center border border-stone-100">
+                            <div class="text-2xl font-bold text-blue-600">SME</div>
+                            <div class="text-xs text-stone-500 font-medium uppercase mt-1">Role Level</div>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-xl text-center border border-stone-100">
+                            <div class="text-2xl font-bold text-blue-600">WCAG</div>
+                            <div class="text-xs text-stone-500 font-medium uppercase mt-1">Compliance</div>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-xl text-center border border-stone-100">
+                            <div class="text-2xl font-bold text-blue-600">High</div>
+                            <div class="text-xs text-stone-500 font-medium uppercase mt-1">Client CSAT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intro Context for Chart -->
+                <div class="bg-stone-50 rounded-xl p-6 border border-stone-200">
+                    <div class="mb-4 border-b border-stone-200 pb-2">
+                        <h3 class="text-lg font-bold text-stone-800">Professional Balance Profile</h3>
+                        <p class="text-sm text-stone-500">
+                            This visualization represents the distribution of my expertise across key domains, highlighting a strong balance between technical QA rigor and project leadership.
+                        </p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="skillsRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Interactive Skills Analysis -->
+        <section id="skills" class="space-y-6">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-stone-900">Core Competencies</h2>
+                <p class="mt-2 text-stone-600">A detailed breakdown of technical tools and functional leadership abilities. Hover over cards for details.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Technical Skills Column -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition duration-300">
+                    <h3 class="flex items-center text-xl font-bold text-stone-800 mb-4">
+                        <span class="mr-2 text-2xl">💻</span> Technical Proficiency
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-stone-700">Web Accessibility (WCAG/W3C)</span>
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Certified</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 95%"></div>
+                            </div>
+                            <p class="text-xs text-stone-500 mt-1 hidden group-hover:block fade-in">Expert in Wix Accessibility & global standards.</p>
+                        </li>
+                        <li class="group">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-stone-700">HTML5 / CSS3 / JS Basics</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </li>
+                        <li class="group">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-stone-700">Platform QA (Wix, eCommerce)</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Functional Skills Column -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition duration-300">
+                    <h3 class="flex items-center text-xl font-bold text-stone-800 mb-4">
+                        <span class="mr-2 text-2xl">🤝</span> Leadership & Strategy
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-stone-700">Project Management</span>
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Lead</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-indigo-600 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                            <p class="text-xs text-stone-500 mt-1 hidden group-hover:block fade-in">SLA compliance, TAT improvements, Strategic deliverables.</p>
+                        </li>
+                        <li class="group">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-stone-700">Client Relationship Mgmt</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-indigo-600 h-2 rounded-full" style="width: 88%"></div>
+                            </div>
+                        </li>
+                        <li class="group">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium text-stone-700">Report Gen & Presentation</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-indigo-600 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Interactive Experience Timeline -->
+        <section id="experience" class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 md:p-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-900">Career Journey</h2>
+                <p class="text-stone-600 mt-2">
+                    Select a role below to view detailed achievements and responsibilities. This interactive view allows you to focus on the specific impact delivered in each phase of my career.
+                </p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Navigation (Left Side) -->
+                <div class="flex md:flex-col overflow-x-auto md:overflow-visible gap-3 md:w-1/3 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-stone-200 pr-0 md:pr-4" id="role-nav">
+                    <!-- Buttons injected by JS -->
+                </div>
+
+                <!-- Details Panel (Right Side) -->
+                <div class="md:w-2/3 min-h-[300px]" id="role-details">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Education & Certifications Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Education -->
+            <div class="md:col-span-2 bg-stone-100 rounded-xl p-6 border border-stone-200">
+                <h3 class="text-xl font-bold text-stone-800 mb-4 flex items-center">
+                    <span class="mr-2">🎓</span> Education
+                </h3>
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-stone-900">B.Tech (Computer Science & Engineering)</h4>
+                                <p class="text-stone-600">GBTU Lucknow</p>
+                            </div>
+                            <span class="text-xs font-semibold text-stone-400 border border-stone-200 px-2 py-1 rounded">2008-2012</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm opacity-75">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-stone-900">Intermediate & High School (PCM)</h4>
+                                <p class="text-stone-600">UP Board Allahabad</p>
+                            </div>
+                            <span class="text-xs font-semibold text-stone-400 border border-stone-200 px-2 py-1 rounded">2005-2007</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certifications -->
+            <div class="bg-stone-800 text-stone-100 rounded-xl p-6 shadow-md">
+                <h3 class="text-xl font-bold mb-4 flex items-center text-yellow-400">
+                    <span class="mr-2">⭐</span> Certifications
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="mr-2 mt-1 text-green-400">✅</span>
+                        <div>
+                            <span class="block font-medium">Wix Accessibility</span>
+                            <span class="text-xs text-stone-400">Issued by WIX</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2 mt-1 text-blue-400">✅</span>
+                        <div>
+                            <span class="block font-medium">Project Management Foundations</span>
+                            <span class="text-xs text-stone-400">LinkedIn Learning</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2 mt-1 text-blue-400">✅</span>
+                        <div>
+                            <span class="block font-medium">Generative AI</span>
+                            <span class="text-xs text-stone-400">LinkedIn Learning</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 5. Achievements Spotlight -->
+        <section class="bg-blue-50 rounded-2xl p-8 border border-blue-100 text-center">
+            <h2 class="text-2xl font-bold text-blue-900 mb-6">Key Achievements</h2>
+            <div class="flex flex-col md:flex-row justify-center gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm max-w-sm mx-auto">
+                    <div class="text-3xl mb-2">🏆</div>
+                    <h3 class="font-bold text-stone-800 mb-2">International Leadership</h3>
+                    <p class="text-sm text-stone-600">Successfully led projects for international clients, ensuring strict SLA compliance and maintaining high CSAT scores.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm max-w-sm mx-auto">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <h3 class="font-bold text-stone-800 mb-2">Process Optimization</h3>
+                    <p class="text-sm text-stone-600">Achieved measurable improvements in Turnaround Time (TAT) through strategic process optimization initiatives.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-stone-900 text-stone-300 py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold text-white mb-6">Let's Connect</h2>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-6 mb-8">
+                <a href="mailto:rht2611@gmail.com" class="flex items-center gap-2 hover:text-white transition group bg-stone-800 px-4 py-2 rounded-full">
+                    <span>✉️</span>
+                    <span class="group-hover:underline">rht2611@gmail.com</span>
+                </a>
+                <a href="tel:+919720676537" class="flex items-center gap-2 hover:text-white transition group bg-stone-800 px-4 py-2 rounded-full">
+                    <span>📞</span>
+                    <span>+91-9720676537</span>
+                </a>
+                <a href="https://in.linkedin.com/in/rohit-kumar-46892171" target="_blank" class="flex items-center gap-2 hover:text-white transition group bg-stone-800 px-4 py-2 rounded-full">
+                    <span>🔗</span>
+                    <span class="group-hover:underline">LinkedIn Profile</span>
+                </a>
+            </div>
+            <p class="text-sm text-stone-500">
+                📍 Ghaziabad, Uttar Pradesh, 201001
+            </p>
+            <div class="mt-8 border-t border-stone-800 pt-8 text-xs text-stone-600">
+                &copy; 2024 Rohit Kumar. Generated based on provided resume.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // Data Store based on Source Report
+        const resumeData = {
+            roles: [
+                {
+                    id: 'current',
+                    title: "SME (QA) & Project Lead",
+                    company: "Adaan Digital Solutions Pvt. Ltd.",
+                    dates: "Oct 2023 - Present",
+                    location: "New Delhi, India",
+                    summary: "Leading project lifecycles and biweekly client strategy for international accounts.",
+                    bullets: [
+                        "Led and managed the project lifecycle, including biweekly client meetings to discuss SLA compliance, TAT improvements, and strategic deliverables.",
+                        "Conducted detailed production QA and quality checks on international client websites, ensuring pixel-perfect execution and strict adherence to technical specifications.",
+                        "Applied expertise in web accessibility, leveraging the Wix Accessibility Certification to perform QA against WCAG/W3C standards.",
+                        "Served as the primary point of contact for international clients, achieving high satisfaction scores.",
+                        "Organized monthly quality calls with stakeholders to present metrics and improvement initiatives."
+                    ]
+                },
+                {
+                    id: 'previous',
+                    title: "Web Designer and QA",
+                    company: "Adaan Digital Solutions Pvt. Ltd.",
+                    dates: "Oct 2016 - Sep 2023",
+                    location: "New Delhi, India",
+                    summary: "Foundational role combining design creativity with rigorous quality assurance.",
+                    bullets: [
+                        "Held pivotal roles in both Web Design and Quality Assurance.",
+                        "Contributed to the successful delivery of numerous international web projects.",
+                        "Developed a strong foundation in functional and visual QA processes across various platforms."
+                    ]
+                }
+            ],
+            skills: {
+                labels: ['QA & Control', 'Project Mgmt', 'Accessibility (WCAG)', 'Client Relations', 'Web Tech (HTML/CSS)'],
+                data: [95, 90, 95, 88, 80] // Inferred proficiency scores based on "SME" and "Lead" titles
+            }
+        };
+
+        // State
+        let currentRoleIndex = 0;
+
+        // --- Functions ---
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTimelineNav();
+            renderRoleDetails(0);
+            initCharts();
+        });
+
+        // 1. Render Timeline Navigation
+        function renderTimelineNav() {
+            const navContainer = document.getElementById('role-nav');
+            navContainer.innerHTML = '';
+
+            resumeData.roles.forEach((role, index) => {
+                const btn = document.createElement('button');
+                btn.className = `timeline-btn w-full text-left p-4 rounded-lg border border-stone-200 mb-2 hover:bg-stone-50 transition duration-200 flex flex-col ${index === 0 ? 'active shadow-md' : 'bg-white text-stone-600'}`;
+                btn.onclick = () => switchRole(index);
+                
+                btn.innerHTML = `
+                    <span class="font-bold text-sm block">${role.dates}</span>
+                    <span class="font-semibold text-base block mt-1">${role.title}</span>
+                    <span class="text-xs opacity-80 block mt-1 truncate">${role.company}</span>
+                `;
+                navContainer.appendChild(btn);
+            });
+        }
+
+        // 2. Render Role Details
+        function renderRoleDetails(index) {
+            const role = resumeData.roles[index];
+            const container = document.getElementById('role-details');
+            
+            // Simple fade effect
+            container.classList.remove('fade-in');
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('fade-in');
+
+            container.innerHTML = `
+                <div class="bg-white p-1 rounded-xl h-full">
+                    <div class="border-b border-stone-100 pb-4 mb-4">
+                        <h3 class="text-2xl font-bold text-stone-900">${role.title}</h3>
+                        <div class="flex flex-wrap gap-4 mt-2 text-sm text-stone-500">
+                            <span class="flex items-center gap-1">🏢 ${role.company}</span>
+                            <span class="flex items-center gap-1">📍 ${role.location}</span>
+                            <span class="flex items-center gap-1 text-blue-600 font-medium">📅 ${role.dates}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="prose prose-stone max-w-none">
+                        <p class="text-lg text-stone-700 italic mb-6 border-l-4 border-blue-500 pl-4 bg-blue-50 py-2 rounded-r-lg">
+                            "${role.summary}"
+                        </p>
+                        <h4 class="text-sm font-bold uppercase text-stone-400 mb-3 tracking-wide">Key Responsibilities & Achievements</h4>
+                        <ul class="space-y-3">
+                            ${role.bullets.map(bullet => `
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 mr-2 mt-1.5">•</span>
+                                    <span class="text-stone-700 leading-relaxed">${bullet}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 3. Switch Role Logic
+        function switchRole(index) {
+            currentRoleIndex = index;
+            
+            // Update buttons style
+            const buttons = document.querySelectorAll('.timeline-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.add('active', 'shadow-md');
+                    btn.classList.remove('bg-white', 'text-stone-600');
+                } else {
+                    btn.classList.remove('active', 'shadow-md');
+                    btn.classList.add('bg-white', 'text-stone-600');
+                }
+            });
+
+            renderRoleDetails(index);
+        }
+
+        // 4. Initialize Charts
+        function initCharts() {
+            const ctx = document.getElementById('skillsRadarChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: resumeData.skills.labels,
+                    datasets: [{
+                        label: 'Proficiency Score (Estimated)',
+                        data: resumeData.skills.data,
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)', // Blue-600 with opacity
+                        borderColor: '#2563eb', // Blue-600
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2563eb',
+                        pointHoverBackgroundColor: '#2563eb',
+                        pointHoverBorderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' }, // stone-200
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: {
+                                font: { size: 11, weight: 'bold' },
+                                color: '#44403c' // stone-700
+                            },
+                            ticks: { display: false, max: 100 },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1c1917', // stone-900
+                            titleColor: '#fff',
+                            bodyColor: '#d6d3d1', // stone-300
+                            padding: 10,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 5. Scroll Utility
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    </script>
+</body>
+</html>
