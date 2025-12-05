@@ -23,7 +23,7 @@
     <!-- Visualization & Content Choices:
          1. Radar Chart (Chart.js): To compare "Technical" vs "Functional" proficiency. Justification: Shows Rohit is well-rounded (SME + Lead).
          2. Interactive List/Detail View: For Experience. Justification: Allows the user to dig into the "Subject Matter Expert" details without being overwhelmed by text walls.
-         3. Metric Cards: Top of page. Justification: Immediate "at a glance" value proposition (8.5 Years, SME, etc.).
+         3. Metric Cards: Top of page. Justification: Immediate "at a glance" value proposition (9 Years, SME, etc.).
          4. NO SVG/Mermaid: Using Unicode emojis for icons and CSS shapes for layout elements as requested.
     -->
     
@@ -41,10 +41,14 @@
             margin-right: auto;
         }
 
+        /* * Base active style (blue background, white text) 
+         * !important is used to ensure the background color is respected even when Tailwind's hover classes are applied.
+         */
         .timeline-btn.active {
-            background-color: #2563eb; /* blue-600 */
-            color: white;
-            border-color: #2563eb;
+            background-color: #2563eb !important; /* blue-600 */
+            color: white !important;
+            border-color: #2563eb !important;
+            cursor: default; /* Indicate it's already selected */
         }
 
         /* Smooth transitions */
@@ -103,7 +107,7 @@
                     <!-- Quick Metrics Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
                         <div class="p-4 bg-stone-50 rounded-xl text-center border border-stone-100">
-                            <div class="text-2xl font-bold text-blue-600">8.5+</div>
+                            <div class="text-2xl font-bold text-blue-600">9+</div>
                             <div class="text-xs text-stone-500 font-medium uppercase mt-1">Years Exp</div>
                         </div>
                         <div class="p-4 bg-stone-50 rounded-xl text-center border border-stone-100">
@@ -226,8 +230,8 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-8">
-                <!-- Navigation (Left Side) -->
-                <div class="flex md:flex-col overflow-x-auto md:overflow-visible gap-3 md:w-1/3 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-stone-200 pr-0 md:pr-4" id="role-nav">
+                <!-- Navigation (Left Side) - Now always stacked (flex-col) on all sizes -->
+                <div class="flex flex-col gap-3 md:w-1/3 pb-4 md:pb-0 md:border-r border-stone-200 pr-0 md:pr-4" id="role-nav">
                     <!-- Buttons injected by JS -->
                 </div>
 
@@ -403,7 +407,10 @@
 
             resumeData.roles.forEach((role, index) => {
                 const btn = document.createElement('button');
-                btn.className = `timeline-btn w-full text-left p-4 rounded-lg border border-stone-200 mb-2 hover:bg-stone-50 transition duration-200 flex flex-col ${index === 0 ? 'active shadow-md' : 'bg-white text-stone-600'}`;
+                // Updated: Added a new class `inactive-hover` to handle hover for *inactive* tabs only.
+                const hoverClasses = 'hover:bg-blue-50 hover:text-blue-700'; 
+                
+                btn.className = `timeline-btn w-full text-left p-4 rounded-lg border border-stone-200 mb-2 transition duration-200 flex flex-col ${index === 0 ? 'active shadow-md' : 'bg-white text-stone-600 ' + hoverClasses}`;
                 btn.onclick = () => switchRole(index);
                 
                 btn.innerHTML = `
@@ -458,15 +465,18 @@
         function switchRole(index) {
             currentRoleIndex = index;
             
-            // Update buttons style
             const buttons = document.querySelectorAll('.timeline-btn');
+            const inactiveHoverClasses = 'hover:bg-blue-50 hover:text-blue-700';
+
             buttons.forEach((btn, idx) => {
                 if (idx === index) {
+                    // Active Tab: Ensure it has the active class and remove inactive hover effects
                     btn.classList.add('active', 'shadow-md');
-                    btn.classList.remove('bg-white', 'text-stone-600');
+                    btn.classList.remove('bg-white', 'text-stone-600', ...inactiveHoverClasses.split(' '));
                 } else {
+                    // Inactive Tab: Ensure it is not active and add inactive hover effects
                     btn.classList.remove('active', 'shadow-md');
-                    btn.classList.add('bg-white', 'text-stone-600');
+                    btn.classList.add('bg-white', 'text-stone-600', ...inactiveHoverClasses.split(' '));
                 }
             });
 
@@ -532,5 +542,4 @@
         }
     </script>
 </body>
-
 </html>
